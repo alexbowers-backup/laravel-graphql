@@ -2,12 +2,8 @@
 
 use AlexBowers\GraphQL\BaseQuery;
 use AlexBowers\GraphQL\Processor;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Type\NonNullType;
-use Youshido\GraphQL\Type\Scalar\IntType;
 use Youshido\GraphQL\Type\Scalar\StringType as GraphQLStringType;
 
 class StringType
@@ -72,13 +68,7 @@ class StringType
         $class = $this->class;
 
         return function ($value, array $args, ResolveInfo $info) use ($class) {
-            $response = $class->resolve($value, $args, $info);
-
-            if ($response instanceof Collection || $response instanceof Model) {
-                return $response->toArray();
-            }
-
-            return $response;
+            return $class->resolve($value, $args, $info);
         };
     }
 
