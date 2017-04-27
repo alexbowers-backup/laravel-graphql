@@ -20,6 +20,8 @@ class BasicStringTest extends BaseTestCase
             'query' => [
                 new class extends BaseQuery
                 {
+                    public $name = 'BasicString';
+
                     function resolve($value, array $args, ResolveInfo $info)
                     {
                         return 'Hello World';
@@ -41,4 +43,49 @@ class BasicStringTest extends BaseTestCase
 
         $this->assertEquals($expected, $response);
     }
+
+    /**
+     * @test
+     */
+     function i_can_see_multiple_values_are_returned()
+     {
+         $request = '{ BasicString, MoreAdvancedString }';
+
+         $schema = $this->schema->build([
+             'query' => [
+                 new class extends BaseQuery
+                 {
+                     public $name = 'BasicString';
+
+                     function resolve($value, array $args, ResolveInfo $info)
+                     {
+                         return 'Hello World';
+                     }
+                 },
+                 new class extends BaseQuery
+                 {
+                     public $name = 'MoreAdvancedString';
+
+                     function resolve($value, array $args, ResolveInfo $info)
+                     {
+                         return 'Fizz Buzz';
+                     }
+                 },
+             ],
+         ]);
+
+         $processor = new Processor($schema);
+         $processor->processPayload($request);
+
+         $response = $processor->getResponseData();
+
+         $expected = [
+             'data' => [
+                 'BasicString' => 'Hello World',
+                 'MoreAdvancedString' => 'Fizz Buzz',
+             ]
+         ];
+
+         $this->assertEquals($expected, $response);
+     }
 }
