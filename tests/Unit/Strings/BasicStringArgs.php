@@ -93,4 +93,51 @@ class BasicStringArgs extends BaseTestCase
 
         $this->assertEquals($expected, $response);
     }
+
+    /**
+     * @test
+     */
+     function one_required_boolean_argument()
+     {
+         $request = '{ capitalised: BasicString(capitalise: true), noncapitalised: BasicString(capitalise: false) }';
+
+         $schema = $this->schema->build([
+             'query' => [
+                 new class extends BaseQuery
+                 {
+                     public $name = 'BasicString';
+
+                     function args()
+                     {
+                         return [
+                             'capitalise' => 'boolean',
+                         ];
+                     }
+
+                     function resolve($value, array $args, ResolveInfo $info)
+                     {
+                         if ($args['capitalise']) {
+                             return strtoupper('Hello World');
+                         }
+
+                         return 'Hello World';
+                     }
+                 },
+             ],
+         ]);
+
+         $processor = new Processor($schema);
+         $processor->processPayload($request);
+
+         $response = $processor->getResponseData();
+
+         $expected = [
+             'data' => [
+                 'capitalised' => 'HELLO WORLD',
+                 'noncapitalised' => 'Hello World',
+             ]
+         ];
+
+         $this->assertEquals($expected, $response);
+     }
 }

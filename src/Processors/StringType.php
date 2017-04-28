@@ -4,6 +4,7 @@ use AlexBowers\GraphQL\BaseQuery;
 use AlexBowers\GraphQL\Processor;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Type\NonNullType;
+use Youshido\GraphQL\Type\Scalar\BooleanType;
 use Youshido\GraphQL\Type\Scalar\IntType;
 use Youshido\GraphQL\Type\Scalar\StringType as GraphQLStringType;
 
@@ -61,6 +62,9 @@ class StringType
                 break;
             case 'integer':
                 return new IntType;
+                break;
+            case 'boolean':
+                return new BooleanType;
                 break;
         }
 
