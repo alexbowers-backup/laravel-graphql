@@ -7,7 +7,7 @@ use AlexBowers\GraphQl\Tests\Unit\BaseTestCase;
 use Youshido\GraphQL\Execution\Processor;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
-class BasicStringArgs extends BaseTestCase
+class BasicStringArgsTest extends BaseTestCase
 {
     /**
      * @test
