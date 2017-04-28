@@ -50,4 +50,47 @@ class BasicStringArgs extends BaseTestCase
 
         $this->assertEquals($expected, $response);
     }
+
+    /**
+     * @test
+     */
+    function two_required_integer_argument()
+    {
+        $request = '{ BasicString(length: 3, offset: 1) }';
+
+        $schema = $this->schema->build([
+            'query' => [
+                new class extends BaseQuery
+                {
+                    public $name = 'BasicString';
+
+                    function args()
+                    {
+                        return [
+                            'length' => 'integer',
+                            'offset' => 'integer',
+                        ];
+                    }
+
+                    function resolve($value, array $args, ResolveInfo $info)
+                    {
+                        return substr("Hello World", $args['offset'], $args['length']);
+                    }
+                },
+            ],
+        ]);
+
+        $processor = new Processor($schema);
+        $processor->processPayload($request);
+
+        $response = $processor->getResponseData();
+
+        $expected = [
+            'data' => [
+                'BasicString' => 'ell',
+            ]
+        ];
+
+        $this->assertEquals($expected, $response);
+    }
 }
