@@ -140,4 +140,96 @@ class BasicStringArgsTest extends BaseTestCase
 
          $this->assertEquals($expected, $response);
      }
+
+    /**
+     * @test
+     */
+    function one_optional_integer_argument()
+    {
+        $request = '{ BasicString }';
+
+        $schema = $this->schema->build([
+            'query' => [
+                new class extends BaseQuery
+                {
+                    public $name = 'BasicString';
+
+                    function args()
+                    {
+                        return [
+                            'length' => 'optional integer',
+                        ];
+                    }
+
+                    function resolve($value, array $args, ResolveInfo $info)
+                    {
+                        if (isset($args['length'])) {
+                            return str_limit('Hello World', $args['length']);
+                        }
+
+                        return 'Hello World';
+                    }
+                },
+            ],
+        ]);
+
+        $processor = new Processor($schema);
+        $processor->processPayload($request);
+
+        $response = $processor->getResponseData();
+
+        $expected = [
+            'data' => [
+                'BasicString' => 'Hello World',
+            ]
+        ];
+
+        $this->assertEquals($expected, $response);
+    }
+
+    /**
+     * @test
+     */
+    function one_nullable_integer_argument()
+    {
+        $request = '{ BasicString }';
+
+        $schema = $this->schema->build([
+            'query' => [
+                new class extends BaseQuery
+                {
+                    public $name = 'BasicString';
+
+                    function args()
+                    {
+                        return [
+                            'length' => 'nullable integer',
+                        ];
+                    }
+
+                    function resolve($value, array $args, ResolveInfo $info)
+                    {
+                        if (isset($args['length'])) {
+                            return str_limit('Hello World', $args['length']);
+                        }
+
+                        return 'Hello World';
+                    }
+                },
+            ],
+        ]);
+
+        $processor = new Processor($schema);
+        $processor->processPayload($request);
+
+        $response = $processor->getResponseData();
+
+        $expected = [
+            'data' => [
+                'BasicString' => 'Hello World',
+            ]
+        ];
+
+        $this->assertEquals($expected, $response);
+    }
 }

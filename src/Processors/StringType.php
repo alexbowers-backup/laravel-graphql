@@ -46,9 +46,17 @@ class StringType
 
     protected function parseType($type)
     {
+        $optional = str_contains($type, ['optional', 'nullable']);
+
+        $type = str_replace(['optional', 'nullable'], '', $type);
+
         $type = trim($type);
 
         $type = $this->getTypeObject($type);
+
+        if ($optional) {
+            return $type;
+        }
 
         return new NonNullType($type);
     }
