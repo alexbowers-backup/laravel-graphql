@@ -4,6 +4,7 @@ use AlexBowers\GraphQL\BaseQuery;
 use AlexBowers\GraphQL\Processor;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Type\NonNullType;
+use Youshido\GraphQL\Type\Scalar\IntType;
 use Youshido\GraphQL\Type\Scalar\StringType as GraphQLStringType;
 
 class StringType
@@ -57,6 +58,9 @@ class StringType
             case 'string':
             case 'text':
                 return new StringType;
+                break;
+            case 'integer':
+                return new IntType;
                 break;
         }
 
