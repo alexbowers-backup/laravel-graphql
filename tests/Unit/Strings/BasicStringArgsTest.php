@@ -232,4 +232,46 @@ class BasicStringArgsTest extends BaseTestCase
 
         $this->assertEquals($expected, $response);
     }
+
+    /**
+     * @test
+     */
+    function one_required_float_argument()
+    {
+        $request = '{ CelciusToKelvin(temperature: 32.59) }';
+
+        $schema = $this->schema->build([
+            'query' => [
+                new class extends BaseQuery
+                {
+                    public $name = 'CelciusToKelvin';
+
+                    function args()
+                    {
+                        return [
+                            'temperature' => 'float',
+                        ];
+                    }
+
+                    function resolve($value, array $args, ResolveInfo $info)
+                    {
+                        return ($args['temperature'] + 273.15) . " Kelvin";
+                    }
+                },
+            ],
+        ]);
+
+        $processor = new Processor($schema);
+        $processor->processPayload($request);
+
+        $response = $processor->getResponseData();
+
+        $expected = [
+            'data' => [
+                'CelciusToKelvin' => "305.74 Kelvin",
+            ]
+        ];
+
+        $this->assertEquals($expected, $response);
+    }
 }
