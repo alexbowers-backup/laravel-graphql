@@ -136,4 +136,82 @@ class BasicObjectTest extends BaseTestCase
 
          $this->assertEquals($expected, $response);
      }
+
+     /**
+      * @test
+      */
+      function an_object_field_can_have_arguments()
+      {
+          $request = '{ Post(id: 2) { title, author, description(length: 5) } }';
+
+          $schema = $this->schema->build([
+              'query' => [
+                  new class extends BaseQuery
+                  {
+                      public $name = 'Post';
+
+                      public $type = 'object';
+
+                      public function args()
+                      {
+                          return [
+                              'id' => 'integer',
+                          ];
+                      }
+
+                      public function fields()
+                      {
+                          return [
+                              'title' => 'string',
+                              'author' => 'string',
+                              'description' => new class extends BaseQuery
+                              {
+
+                                  public function args()
+                                  {
+                                      return [
+                                          'length' => 'nullable integer',
+                                      ];
+                                  }
+
+                                  function resolve($value, array $args, ResolveInfo $info)
+                                  {
+                                      if (isset($args['length'])) {
+                                          return str_limit('Hello World', $args['length']);
+                                      } else {
+                                          return 'Hello World';
+                                      }
+                                  }
+                              },
+                          ];
+                      }
+
+                      function resolve($value, array $args, ResolveInfo $info)
+                      {
+                          return [
+                              'title' => 'An amazing blog post',
+                              'author' => 'Alex Bowers',
+                          ];
+                      }
+                  },
+              ],
+          ]);
+
+          $processor = new Processor($schema);
+          $processor->processPayload($request);
+
+          $response = $processor->getResponseData();
+
+          $expected = [
+              'data' => [
+                  'Post' => [
+                      'title' => 'An amazing blog post',
+                      'author' => 'Alex Bowers',
+                      'description' => 'Hello...',
+                  ],
+              ],
+          ];
+
+          $this->assertEquals($expected, $response);
+      }
 }
