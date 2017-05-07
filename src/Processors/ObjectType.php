@@ -2,16 +2,14 @@
 
 use AlexBowers\GraphQL\BaseQuery;
 use AlexBowers\GraphQL\Processor;
+use AlexBowers\GraphQL\Support\ProcessorAssistant;
 use Youshido\GraphQL\Execution\ResolveInfo;
-use Youshido\GraphQL\Type\NonNullType;
 use Youshido\GraphQL\Type\Object\ObjectType as GraphQLObjectType;
-use Youshido\GraphQL\Type\Scalar\BooleanType;
-use Youshido\GraphQL\Type\Scalar\FloatType;
-use Youshido\GraphQL\Type\Scalar\IntType;
-use Youshido\GraphQL\Type\Scalar\StringType;
 
 class ObjectType
 {
+    use ProcessorAssistant;
+
     protected $name;
 
     /**
@@ -51,47 +49,9 @@ class ObjectType
 
     protected function processFields()
     {
-        return collect($this->class->fields())->map(function($type) {
+        return collect($this->class->fields())->map(function ($type) {
             return $this->parseType($type);
         })->filter()->toArray();
-    }
-
-    protected function parseType($type)
-    {
-        $optional = str_contains($type, ['optional', 'nullable']);
-
-        $type = str_replace(['optional', 'nullable'], '', $type);
-
-        $type = trim($type);
-
-        $type = $this->getTypeObject($type);
-
-        if ($optional) {
-            return $type;
-        }
-
-        return new NonNullType($type);
-    }
-
-    protected function getTypeObject($type)
-    {
-        switch ($type) {
-            case 'string':
-            case 'text':
-                return new StringType;
-                break;
-            case 'integer':
-                return new IntType;
-                break;
-            case 'boolean':
-                return new BooleanType;
-                break;
-            case 'float':
-                return new FloatType;
-                break;
-        }
-
-        throw new \Exception("Unsupported Type {$type}");
     }
 
     protected function processResolve()
@@ -102,5 +62,4 @@ class ObjectType
             return $class->resolve($value, $args, $info);
         };
     }
-
 }
